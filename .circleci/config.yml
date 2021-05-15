@@ -22,7 +22,7 @@ jobs:
           name: Build Docker image
           command: |
             TAG=0.1.$CIRCLE_SHA1
-            docker build -t $DOCKER_REPOSITORY:$TAG .
+            docker build -f Dockerfile.prod -t $DOCKER_REPOSITORY:$TAG .
             echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
             docker push $DOCKER_REPOSITORY:$TAG
   deploy_linode:
