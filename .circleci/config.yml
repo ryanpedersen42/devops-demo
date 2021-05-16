@@ -24,7 +24,7 @@ jobs:
           command: |
             docker build -f Dockerfile.prod -t $DOCKER_REPOSITORY:$CIRCLE_SHA1 .
             echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
-            docker push $DOCKER_REPOSITORY:$TAG
+            docker push $DOCKER_REPOSITORY:$CIRCLE_SHA1
   deploy_linode:
     executor: python
     steps:
