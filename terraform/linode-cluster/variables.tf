@@ -4,17 +4,17 @@
 
     variable "k8s_version" {
       description = "The Kubernetes version to use for this cluster. (required)"
-      default = "1.17"
+      default = "1.18"
     }
 
     variable "label" {
       description = "The unique label to assign to this cluster. (required)"
-      default = "default-lke-cluster"
+      default = "demo-lke-cluster"
     }
 
     variable "region" {
       description = "The region where your cluster will be located. (required)"
-      default = "us-east"
+      default = "eu-west"
     }
 
     variable "tags" {
@@ -32,12 +32,8 @@
       default = [
         {
           type = "g6-standard-4"
-          count = 3
+          count = 1
         },
-        {
-          type = "g6-standard-8"
-          count = 3
-        }
       ]
     }
     
