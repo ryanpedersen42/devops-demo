@@ -44,6 +44,11 @@ jobs:
       - kubernetes/install-kubeconfig
       - helm/install-helm-client:
           version: v3.0.0
+      - helm/install-helm-chart:
+          chart: ./helm-charts/react-app-chart
+          release-name: devops-demo
+          no-output-timeout: 5m
+          values-to-override: image.tag=${CIRCLE_SHA1},image.repository=${DOCKER_REPOSITORY} 
       - run: 
           name: Test kubectl
           command: |
