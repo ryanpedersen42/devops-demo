@@ -22,10 +22,9 @@ jobs:
       - run: 
           name: Build Docker image
           command: |
-            TAG=0.1.$CIRCLE_SHA1
-            docker build -f Dockerfile.prod -t $DOCKER_REPOSITORY:$TAG .
+            docker build -f Dockerfile.prod -t $DOCKER_REPOSITORY:$CIRCLE_SHA1 .
             echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
-            docker push $DOCKER_REPOSITORY:$TAG
+            docker push $DOCKER_REPOSITORY:$CIRCLE_SHA1
   deploy_linode:
     executor: python
     steps:
@@ -45,15 +44,16 @@ jobs:
       - kubernetes/install-kubeconfig
       - helm/install-helm-client:
           version: v3.0.0
+      - helm/upgrade-helm-chart:
+          chart: ./helm-charts/react-app-chart
+          release-name: devops-demo
+          no-output-timeout: 5m
+          values-to-override: image.tag=${CIRCLE_SHA1},image.repository=${DOCKER_REPOSITORY} 
       - run: 
           name: Test kubectl
           command: |
             kubectl get services
             kubectl get pods
-      # - helm/upgrade-helm-chart:
-      #     chart: ./helm-charts/react-app-chart
-      #     release-name: devops-demo-chart
-      #     values-to-override: image.tag=${CIRCLE_SHA1},image.repository=${AWS_CONTAINER_ID}
 
 executors:
   node:
