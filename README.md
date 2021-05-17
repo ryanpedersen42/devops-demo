@@ -1,4 +1,5 @@
 # Devops Demo
+Demo k8s project with terraform and helm in CircleCI
 
 ## Provision cluster
 
