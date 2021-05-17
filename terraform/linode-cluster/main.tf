@@ -1,39 +1,50 @@
-    variable "token" {
-      description = "Your Linode API Personal Access Token. (required)"
+terraform {
+  required_providers {
+    linode = {
+      source = "linode/linode"
+      version = "1.16.0"
     }
+  }
+}
+//Use the Linode Provider
+provider "linode" {
+  token = var.token
+}
 
-    variable "k8s_version" {
-      description = "The Kubernetes version to use for this cluster. (required)"
-      default = "1.18"
-    }
+//Use the linode_lke_cluster resource to create
+//a Kubernetes cluster
+resource "linode_lke_cluster" "cool_linode_cluster" {
+    k8s_version = var.k8s_version
+    label = var.label
+    region = var.region
+    tags = var.tags
 
-    variable "label" {
-      description = "The unique label to assign to this cluster. (required)"
-      default = "demo-lke-cluster"
+    dynamic "pool" {
+        for_each = var.pools
+        content {
+            type  = pool.value["type"]
+            count = pool.value["count"]
+        }
     }
+}
 
-    variable "region" {
-      description = "The region where your cluster will be located. (required)"
-      default = "eu-west"
-    }
+//Export this cluster's attributes
+output "kubeconfig" {
+   value = linode_lke_cluster.cool_linode_cluster.kubeconfig
+}
 
-    variable "tags" {
-      description = "Tags to apply to your cluster for organizational purposes. (optional)"
-      type = list(string)
-      default = ["testing"]
-    }
+output "api_endpoints" {
+   value = linode_lke_cluster.cool_linode_cluster.api_endpoints
+}
 
-    variable "pools" {
-      description = "The Node Pool specifications for the Kubernetes cluster. (required)"
-      type = list(object({
-        type = string
-        count = number
-      }))
-      default = [
-        {
-          type = "g6-standard-4"
-          count = 1
-        },
-      ]
-    }
-    
+output "status" {
+   value = linode_lke_cluster.cool_linode_cluster.status
+}
+
+output "id" {
+   value = linode_lke_cluster.cool_linode_cluster.id
+}
+
+output "pool" {
+   value = linode_lke_cluster.cool_linode_cluster.pool
+}
