@@ -47,6 +47,11 @@ output "id" {
 }
 
 output "pool" {
+<<<<<<< HEAD
    value = linode_lke_cluster.foobar.pool
 }
     
+=======
+   value = linode_lke_cluster.cool_linode_cluster.pool
+}
+>>>>>>> 8500fcd43182be890e7c22f60a622de1d97d663c
