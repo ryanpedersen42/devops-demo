@@ -40,7 +40,7 @@ jobs:
       - run:
           name: Set up LKE kubeconfig
           command: |
-            KUBE_VAR=$( curl -H "Authorization: Bearer $<<parameters.linode_token>>" https://api.linode.com/v4/lke/clusters/${<<parameters.cluster_id>>}/kubeconfig | jq .kubeconfig )
+            KUBE_VAR=$( curl -H "Authorization: Bearer <<pipeline.parameters.linode_token>>" https://api.linode.com/v4/lke/clusters/<<pipeline.parameters.cluster_id>>/kubeconfig | jq .kubeconfig )
             lke_var="export KUBECONFIG_DATA=$KUBE_VAR"
             echo $lke_var >> $BASH_ENV
       - kubernetes/install-kubectl
@@ -68,10 +68,10 @@ executors:
 
 parameters:
   cluster_id:
-    type: env_var_name
+    type: string
     description: LKE Cluster ID
-    default: LINODE_CLUSTER_ID
+    default: $LINODE_CLUSTER_ID
   linode_token:
-    type: env_var_name
+    type: string
     description: Linode API Token
-    default: LINODE_TOKEN
+    default: $LINODE_TOKEN
