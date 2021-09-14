@@ -4,6 +4,7 @@ orbs:
   helm: circleci/helm@1.2.0
   kubernetes: circleci/kubernetes@0.11.2
   terraform: circleci/terraform@2.0.1
+  linode: ryanpedersen/linode@0.1.0
 
 workflows:
   BTD:
@@ -37,14 +38,15 @@ jobs:
           command: |
             if [[ $EUID == 0 ]]; then export SUDO=""; else export SUDO="sudo"; fi
             $SUDO apt-get update && $SUDO apt-get install -y jq
-      - run:
-          name: Set up LKE kubeconfig
-          command: |
-            KUBE_VAR=$( curl -H "Authorization: Bearer <<pipeline.parameters.linode_token>>" https://api.linode.com/v4/lke/clusters/<<pipeline.parameters.cluster_id>>/kubeconfig | jq .kubeconfig )
-            lke_var="export KUBECONFIG_DATA=$KUBE_VAR"
-            echo $lke_var >> $BASH_ENV
-      - kubernetes/install-kubectl
-      - kubernetes/install-kubeconfig
+      - linode/get-kubeconfig
+      # - run:
+      #     name: Set up LKE kubeconfig
+      #     command: |
+      #       KUBE_VAR=$( curl -H "Authorization: Bearer <<pipeline.parameters.linode_token>>" https://api.linode.com/v4/lke/clusters/<<pipeline.parameters.cluster_id>>/kubeconfig | jq .kubeconfig )
+      #       lke_var="export KUBECONFIG_DATA=$KUBE_VAR"
+      #       echo $lke_var >> $BASH_ENV
+      # - kubernetes/install-kubectl
+      # - kubernetes/install-kubeconfig
       # - helm/install-helm-client:
       #     version: v3.0.0
       # - helm/upgrade-helm-chart:
