@@ -13,7 +13,7 @@ provider "linode" {
 
 //Use the linode_lke_cluster resource to create
 //a Kubernetes cluster
-resource "linode_lke_cluster" "cool_linode_cluster" {
+resource "linode_lke_cluster" "foobar" {
     k8s_version = var.k8s_version
     label = var.label
     region = var.region
@@ -30,22 +30,23 @@ resource "linode_lke_cluster" "cool_linode_cluster" {
 
 //Export this cluster's attributes
 output "kubeconfig" {
-   value = linode_lke_cluster.cool_linode_cluster.kubeconfig
+   value = linode_lke_cluster.foobar.kubeconfig
+   sensitive = true
 }
 
 output "api_endpoints" {
-   value = linode_lke_cluster.cool_linode_cluster.api_endpoints
+   value = linode_lke_cluster.foobar.api_endpoints
 }
 
 output "status" {
-   value = linode_lke_cluster.cool_linode_cluster.status
+   value = linode_lke_cluster.foobar.status
 }
 
 output "id" {
-   value = linode_lke_cluster.cool_linode_cluster.id
+   value = linode_lke_cluster.foobar.id
 }
 
 output "pool" {
-   value = linode_lke_cluster.cool_linode_cluster.pool
+   value = linode_lke_cluster.foobar.pool
 }
     

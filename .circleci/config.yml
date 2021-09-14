@@ -8,12 +8,14 @@ orbs:
 workflows:
   BTD:
     jobs:
-      - build_docker
-      - deploy_linode:
-          requires:
-            - build_docker
+      - deploy_linode
+      # - build_docker
+      # - deploy_linode:
+      #     requires:
+      #       - build_docker
 
 jobs:
+  # build docker image to use and send it to repository 
   build_docker:
     executor: node
     steps:
@@ -25,6 +27,7 @@ jobs:
             docker build -f Dockerfile.prod -t $DOCKER_REPOSITORY:$CIRCLE_SHA1 .
             echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin
             docker push $DOCKER_REPOSITORY:$CIRCLE_SHA1
+  # update lke with new image
   deploy_linode:
     executor: python
     steps:
@@ -37,18 +40,18 @@ jobs:
       - run:
           name: Set up LKE kubeconfig
           command: |
-            KUBE_VAR=$( curl -H "Authorization: Bearer $LINODE_TOKEN" https://api.linode.com/v4/lke/clusters/${LINODE_CLUSTER_ID}/kubeconfig | jq .kubeconfig )
+            KUBE_VAR=$( curl -H "Authorization: Bearer $<<parameters.linode_token>>" https://api.linode.com/v4/lke/clusters/${<<parameters.cluster_id>>}/kubeconfig | jq .kubeconfig )
             lke_var="export KUBECONFIG_DATA=$KUBE_VAR"
             echo $lke_var >> $BASH_ENV
       - kubernetes/install-kubectl
       - kubernetes/install-kubeconfig
-      - helm/install-helm-client:
-          version: v3.0.0
-      - helm/upgrade-helm-chart:
-          chart: ./helm-charts/react-app-chart
-          release-name: devops-demo
-          no-output-timeout: 5m
-          values-to-override: image.tag=${CIRCLE_SHA1},image.repository=${DOCKER_REPOSITORY} 
+      # - helm/install-helm-client:
+      #     version: v3.0.0
+      # - helm/upgrade-helm-chart:
+      #     chart: ./helm-charts/react-app-chart
+      #     release-name: devops-demo
+      #     no-output-timeout: 5m
+      #     values-to-override: image.tag=${CIRCLE_SHA1},image.repository=${DOCKER_REPOSITORY} 
       - run: 
           name: Test kubectl
           command: |
@@ -62,3 +65,13 @@ executors:
   python:
     docker:
       - image: cimg/python:3.9.5
+
+parameters:
+  cluster_id:
+    type: env_var_name
+    description: LKE Cluster ID
+    default: LINODE_CLUSTER_ID
+  linode_token:
+    type: env_var_name
+    description: Linode API Token
+    default: LINODE_TOKEN
